@@ -3,7 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import { limiter } from './middlewares/rateLimiter';
-import { errorHandler } from './middlewares/errorHandler';
+// import { errorHandler } from './middlewares/errorHandler';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import exerciseRoutes from './routes/exercise.routes';
@@ -18,10 +18,16 @@ app.use(helmet());
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: false }));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '1mb' }));
-const router = Router();
+
+app.use((_req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+});
+
 app.use(limiter);
 
-// * Rutas
+const router = Router();
+
 router.get('/health', (_req, res) =>
   res.json({ status: 'ok', timestamp: new Date().toISOString() }),
 );
@@ -33,11 +39,12 @@ router.use('/workout-plans', workoutPlanRoutes);
 router.use('/workout-sessions', workoutSessionRoutes);
 router.use('/progress', progressRoutes);
 
-app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-  next();
+app.use('/api', router);
+
+app.use((_req, res, next) => {
+  res.status(404).json({ error: { message: 'Route not found' } });
 });
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 export default app;
