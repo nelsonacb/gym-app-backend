@@ -15,7 +15,6 @@ export const validate =
       if (schemas.params)
         req.params = schemas.params.parse(req.params) as typeof req.params;
       if (schemas.query) {
-        // Express 4: req.query is read-only, but we can mutate properties on it
         const parsed = schemas.query.parse(req.query);
         Object.assign(req.query, parsed);
       }

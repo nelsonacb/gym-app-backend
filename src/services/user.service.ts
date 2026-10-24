@@ -3,15 +3,23 @@ import { AppError } from '../utils/appError';
 import type {
   UpdatePreferencesInput,
   UpdateProfileInput,
-} from '../schemas/user.schema.js';
+} from '../schemas/user.schema';
 
 export const updateProfile = async (
   userId: string,
   input: UpdateProfileInput,
 ) => {
-  const user = await prisma.user.update({
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new AppError('User not found', 404);
+
+  return prisma.user.update({
     where: { id: userId },
-    data: input,
+    data: {
+      ...(input.name !== undefined ? { name: input.name } : {}),
+      ...(input.weightUnit !== undefined
+        ? { weightUnit: input.weightUnit }
+        : {}),
+    },
     select: {
       id: true,
       name: true,
@@ -21,12 +29,22 @@ export const updateProfile = async (
       updatedAt: true,
     },
   });
-  return user;
 };
 
 export const getPreferences = async (userId: string) => {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new AppError('User not found', 404);
+
   const prefs = await prisma.userPreference.findUnique({ where: { userId } });
-  return prefs ?? { userId, weeklyGoal: null, weightUnit: 'KG' };
+
+  if (!prefs) {
+    return {
+      userId,
+      weeklyGoal: null,
+      weightUnit: user.weightUnit,
+    };
+  }
+  return prefs;
 };
 
 export const updatePreferences = async (

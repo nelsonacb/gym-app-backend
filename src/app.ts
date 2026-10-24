@@ -3,7 +3,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import { limiter } from './middlewares/rateLimiter';
-// import { errorHandler } from './middlewares/errorHandler';
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
 import exerciseRoutes from './routes/exercise.routes';
@@ -11,6 +10,7 @@ import workoutPlanRoutes from './routes/workoutPlan.routes';
 import workoutSessionRoutes from './routes/workoutSession.routes';
 import progressRoutes from './routes/progress.routes';
 import { env } from './config';
+import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
@@ -45,6 +45,6 @@ app.use((_req, res, next) => {
   res.status(404).json({ error: { message: 'Route not found' } });
 });
 
-// app.use(errorHandler);
+app.use(errorHandler);
 
 export default app;
