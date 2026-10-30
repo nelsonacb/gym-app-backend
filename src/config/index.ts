@@ -12,7 +12,7 @@ const envSchema = z.object({
     .enum(['development', 'production', 'test'])
     .default('development'),
   BCRYPT_ROUNDS: z.coerce.number().int().min(8).max(15).default(10),
-  CORS_ORIGIN: z.string().default('http://localhost:3000'),
+  CORS_ORIGIN: z.string().default('*'),
 });
 
 export const env = envSchema.parse(process.env);
