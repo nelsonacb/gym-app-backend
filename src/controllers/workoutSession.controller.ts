@@ -29,6 +29,7 @@ export const complete = async (req: Request, res: Response) => {
   const session = await sessionService.completeSession(
     req.user!.sub,
     req.params.id as string,
+    req.body,
   );
   res.json({ session });
 };

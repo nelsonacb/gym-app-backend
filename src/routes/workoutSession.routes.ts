@@ -3,6 +3,7 @@ import * as sessionController from '../controllers/workoutSession.controller.js'
 import { authenticate } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
 import {
+  completeSessionSchema,
   listSessionsQuerySchema,
   logSetSchema,
   sessionExerciseIdParamSchema,
@@ -46,7 +47,7 @@ router.patch(
 );
 router.post(
   '/:id/complete',
-  validate({ params: sessionIdParamSchema }),
+  validate({ params: sessionIdParamSchema, body: completeSessionSchema }),
   asyncHandler(sessionController.complete),
 );
 router.post(

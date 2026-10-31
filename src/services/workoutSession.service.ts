@@ -166,12 +166,14 @@ export const logSet = async (
 /* COMPLETE SESSION                                                    */
 /* Derives duration and totalVolume from completed sets only.          */
 /* ------------------------------------------------------------------ */
-export const completeSession = async (userId: string, sessionId: string) => {
+export const completeSession = async (
+  userId: string,
+  sessionId: string,
+  input: { finishedAt?: Date } = {},
+) => {
   const session = await prisma.workoutSession.findUnique({
     where: { id: sessionId },
-    include: {
-      sessionExercises: { include: { sets: true } },
-    },
+    include: { sessionExercises: { include: { sets: true } } },
   });
   if (!session) throw new AppError('Workout session not found', 404);
   if (session.userId !== userId) throw new AppError('Forbidden', 403);
@@ -179,7 +181,7 @@ export const completeSession = async (userId: string, sessionId: string) => {
     throw new AppError('Session is not in progress', 400);
   }
 
-  const finishedAt = new Date();
+  const finishedAt = input.finishedAt ?? new Date();
   const durationSeconds = Math.max(
     0,
     Math.floor((finishedAt.getTime() - session.startedAt.getTime()) / 1000),
@@ -198,12 +200,7 @@ export const completeSession = async (userId: string, sessionId: string) => {
 
   return prisma.workoutSession.update({
     where: { id: sessionId },
-    data: {
-      status: 'COMPLETED',
-      finishedAt,
-      durationSeconds,
-      totalVolume,
-    },
+    data: { status: 'COMPLETED', finishedAt, durationSeconds, totalVolume },
     include: sessionInclude,
   });
 };

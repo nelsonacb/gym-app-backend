@@ -1,8 +1,12 @@
 import { z } from 'zod';
 
 export const startSessionSchema = z.object({
-  workoutPlanId: z.string().uuid(),
+  workoutPlanId: z.uuid(),
   startedAt: z.coerce.date().optional(),
+});
+
+export const completeSessionSchema = z.object({
+  finishedAt: z.coerce.date().optional(),
 });
 
 export const logSetSchema = z.object({

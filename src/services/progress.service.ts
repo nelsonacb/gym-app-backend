@@ -27,23 +27,36 @@ export const getOverallProgress = async (userId: string) => {
     0,
   );
 
-  // Weekly frequency (ISO week starting Monday)
-  const weekly: Record<string, number> = {};
+  // Agrupar por semana ISO (lunes como primer día)
+  const weeklyCount: Record<string, number> = {};
+  const weeklyVolume: Record<string, number> = {};
+
   for (const s of sessions) {
     const d = new Date(s.startedAt);
-    const day = d.getUTCDay() || 7;
-    d.setUTCDate(d.getUTCDate() - (day - 1));
-    const key = d.toISOString().slice(0, 10);
-    weekly[key] = (weekly[key] ?? 0) + 1;
+    const day = d.getUTCDay() || 7; // domingo = 7
+    d.setUTCDate(d.getUTCDate() - (day - 1)); // lunes de esa semana
+    const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+
+    weeklyCount[key] = (weeklyCount[key] ?? 0) + 1;
+    weeklyVolume[key] = (weeklyVolume[key] ?? 0) + (s.totalVolume ?? 0);
   }
+
+  const sortedWeeks = Array.from(
+    new Set([...Object.keys(weeklyCount), ...Object.keys(weeklyVolume)]),
+  ).sort((a, b) => a.localeCompare(b));
 
   return {
     totalSessions,
     totalVolume,
     totalDurationSeconds: totalDuration,
-    weeklyFrequency: Object.entries(weekly)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([weekStart, count]) => ({ weekStart, count })),
+    weeklyFrequency: sortedWeeks.map((weekStart) => ({
+      weekStart,
+      count: weeklyCount[weekStart] ?? 0,
+    })),
+    weeklyVolume: sortedWeeks.map((weekStart) => ({
+      weekStart,
+      volume: weeklyVolume[weekStart] ?? 0,
+    })),
   };
 };
 
