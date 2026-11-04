@@ -1,5 +1,7 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import * as sessionService from '../services/workoutSession.service.js';
+import { listSessionsQuerySchema } from '../schemas/workoutSession.schema.js';
+import { listSessions } from '../services/workoutSession.service.js';
 
 export const start = async (req: Request, res: Response) => {
   const session = await sessionService.startSession(req.user!.sub, req.body);
@@ -42,10 +44,12 @@ export const cancel = async (req: Request, res: Response) => {
   res.json({ session });
 };
 
-export const list = async (req: Request, res: Response) => {
-  const result = await sessionService.listSessions(
-    req.user!.sub,
-    req.query as never,
-  );
-  res.json(result);
+export const list = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const query = listSessionsQuerySchema.parse(req.query);
+    const result = await listSessions(req.user!.sub, query);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
 };
