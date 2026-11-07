@@ -111,7 +111,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 | `npm start`                | Run compiled build (`dist/server.js`)             |
 | `npm run prisma:migrate`   | Create and apply a new migration                  |
 | `npm run prisma:deploy`    | Apply existing migrations (production)            |
-| `npm run prisma:seed`      | Seed exercises + demo workout plans               |
+| `npm run scripts:seed`     | Seed exercises + demo workout plans               |
 | `npm run prisma:studio`    | Open Prisma Studio (DB GUI)                       |
 | `npm run openapi:generate` | Export `openapi.json` for external tools          |
 
@@ -139,8 +139,10 @@ src/
 └── server.ts              # bootstrap + graceful shutdown
 prisma/
 ├── schema.prisma
-├── seed.ts
 └── migrations/
+scripts/
+├── seed-sessions.ts
+├── seed.ts
 ```
 
 **Layering:** route → controller → service → prisma. Controllers never contain logic; services never touch `req`/`res`.
