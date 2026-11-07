@@ -11,6 +11,7 @@ import workoutSessionRoutes from './routes/workoutSession.routes';
 import progressRoutes from './routes/progress.routes';
 import { env } from './config';
 import { errorHandler } from './middlewares/errorHandler';
+import { swaggerUiServe, swaggerUiSetup } from './config/swagger';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use((_req, res, next) => {
 });
 
 app.use(limiter);
+app.use('/api-docs', swaggerUiServe, swaggerUiSetup);
 
 const router = Router();
 
