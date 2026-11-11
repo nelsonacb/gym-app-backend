@@ -20,7 +20,7 @@
   "keywords": [],
   "author": "Nelson Alejandro Cruz Borrego",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/nelsonacb/gym-app-backend/issues"
   },
